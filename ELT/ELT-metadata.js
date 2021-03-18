@@ -12,10 +12,10 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
   Promise.resolve(db.collection('RAWDATA_availableCharacteristics').find().forEach((doc) => db.collection('metaData').insertOne(doc)))
 
   // run this command in mongo terminal to create metaData documents with correct characteristics
-  // db.metaData.aggregate([
-  //   { $group : { _id: '$product_id', characteristics: { $push: '$name' }, ids: { $push: '$id' }}},
-  //   { $out: 'metaDataMerged' }
-  // ], { allowDiskUse: true })
+  db.collection('metaData').aggregate([
+    { $group : { _id: '$product_id', characteristics: { $push: '$name' }, ids: { $push: '$id' }}},
+    { $out: 'metaDataMerged' }
+  ], { allowDiskUse: true })
 
   // check that the correct number of documents are in the metaData collection - compare the output from this to 'db.metaDataMerged.count({})' run in the terminal
   Promise.resolve(db.collection('RAWDATA_availableCharacteristics').distinct('product_id'))

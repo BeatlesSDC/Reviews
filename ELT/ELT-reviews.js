@@ -1,14 +1,16 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 
+//started at 5:03
+
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
   if (err) {
     console.log(err);
     return;
   }
-  var db = client.db('reviews');
+  var db = client.db('SDC');
 
-  //Create new collection where review documents use id from CSV as _id
+  // Create new collection where review documents use id from CSV as _id
   Promise.resolve(db.collection('RAWDATA_reviews').find().forEach((doc) => {
     doc._id = doc.id;
     db.collection('reviewsWithProperIDs').insertOne(doc);
@@ -19,7 +21,10 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
   .catch((err) => {
     console.log(err);
   })
-  //Pull photos into review documents (make sure review_id is indexed in reviewPhotos)
+  // //Pull photos into review documents (make sure review_id is indexed in reviewPhotos)
+  .then(() => {
+    return db.collection('RAWDATA_reviewPhotos').createIndex({ review_id: 1 });
+  })
   .then(() => {
     Promise.resolve(db.collection('reviewsWithProperIDs').find().forEach((doc) => {
       doc.photos = [];
@@ -27,10 +32,9 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
         doc.photos.push(photoDoc.url);
       }))
       .then(() => {
-        db.collection('reviewsWithPhotos').insertOne(doc);
+        db.collection('reviews').insertOne(doc);
       })
       .catch((err) => {
-        console.log('error1:');
         console.log(err);
       })
     }))
@@ -38,11 +42,9 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
       console.log('finished');
     })
     .catch((err) => {
-      console.log('error2:');
       console.log(err);
-    })
-    .then(() => {
-      client.close();
     });
   });
 });
+
+//db.reviewsWithProperIDs.drop()
