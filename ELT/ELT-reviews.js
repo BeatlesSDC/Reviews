@@ -19,7 +19,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
   .catch((err) => {
     console.log(err);
   })
-  //Pull photos into review documents
+  //Pull photos into review documents (make sure review_id is indexed in reviewPhotos)
   .then(() => {
     Promise.resolve(db.collection('reviewsWithProperIDs').find().forEach((doc) => {
       doc.photos = [];
@@ -41,5 +41,8 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
       console.log('error2:');
       console.log(err);
     })
+    .then(() => {
+      client.close();
+    });
   });
 });
