@@ -21,7 +21,18 @@ var getReviewsMetadata = (productID, callback) => {
   });
 }
 
+var markReviewHelpful = (reviewID, callback) => {
+  MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+    if (err) {
+      return console.log(err);
+    }
+    var db = client.db('SDC');
+    db.collection('reviews').updateOne({ _id: Number(reviewID) }, { $inc: { helpfulness: 1 }}, callback);
+  });
+}
+
 module.exports = {
   getReviews,
-  getReviewsMetadata
+  getReviewsMetadata,
+  markReviewHelpful
 }

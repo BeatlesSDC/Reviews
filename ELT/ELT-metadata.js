@@ -61,7 +61,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
         } else {
           doc.ratings[review.rating] += 1;
         }
-        doc.recommended[review.recommend] += 1;
+        doc.recommended[Boolean(review.recommend)] += 1;
       }))
       .then(() => {
         return db.collection('metadata').insertOne(doc);
