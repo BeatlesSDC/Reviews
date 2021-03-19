@@ -1,8 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 
-//started at 5:03
-
 MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
   if (err) {
     console.log(err);
