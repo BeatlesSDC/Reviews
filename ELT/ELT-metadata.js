@@ -64,7 +64,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
         doc.recommended[review.recommend] += 1;
       }))
       .then(() => {
-        return db.collection('metaData').insertOne(doc);
+        return db.collection('metadata').insertOne(doc);
       })
       .catch((err) => {
         console.log('error:', err);
