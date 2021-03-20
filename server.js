@@ -45,6 +45,18 @@ app.put('/reviews/:id/helpful', (req, res) => {
   });
 })
 
+app.put('/reviews/:id/report', (req, res) => {
+  let review_id = req.params.id;
+
+  db.reportReview(review_id, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(204);
+    }
+  });
+})
+
 app.listen(3001, () => {
   console.log('back-end server listening on port 3001');
 })

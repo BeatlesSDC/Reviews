@@ -31,8 +31,30 @@ var markReviewHelpful = (reviewID, callback) => {
   });
 }
 
+var reportReview = (reviewID, callback) => {
+  MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+    if (err) {
+      return console.log(err);
+    }
+    var db = client.db('SDC');
+    db.collection('reviews').find({ _id: Number(reviewID) }).forEach((doc) => {
+      db.collection('reported').insertOne(doc);
+    })
+    .then(() => {
+      return db.collection('reviews').deleteOne({ _id: Number(reviewID) });
+    })
+    .then(() => {
+      callback(null);
+    })
+    .catch((err) => {
+      callback(err);
+    })
+  });
+}
+
 module.exports = {
   getReviews,
   getReviewsMetadata,
-  markReviewHelpful
+  markReviewHelpful,
+  reportReview
 }
