@@ -1,7 +1,15 @@
 const connection = require('./dbConnection');
 
 var getReviews = (productID, page, count, sort, callback) => {
-  connection.getDb().collection('reviews').find({ product_id: Number(productID) }).limit(Number(count)).toArray(callback);
+  if (sort === 'newest') {
+    connection.getDb().collection('reviews').find({ product_id: Number(productID) }).sort({date: -1}).skip((page - 1) * count).limit(Number(count)).toArray(callback);
+  } else  if (sort === 'helpful') {
+    connection.getDb().collection('reviews').find({ product_id: Number(productID) }).sort({helpfulness: -1}).skip((page - 1) * count).limit(Number(count)).toArray(callback);
+  } else  if (sort === 'relevant') {
+    connection.getDb().collection('reviews').find({ product_id: Number(productID) }).sort({helpfulness: -1, date: -1}).skip((page - 1) * count).limit(Number(count)).toArray(callback);
+  } else {
+    connection.getDb().collection('reviews').find({ product_id: Number(productID) }).skip((page - 1) * count).limit(Number(count)).toArray(callback);
+  }
 }
 
 var getReviewsMetadata = (productID, callback) => {

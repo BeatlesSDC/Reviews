@@ -48,3 +48,5 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
 });
 
 //db.reviewsWithProperIDs.drop()
+//db.reviews.createIndex({helpfulness:1})
+//db.reviews.createIndex({date:1})

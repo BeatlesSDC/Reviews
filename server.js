@@ -11,12 +11,12 @@ connection.connect((err) => {
     return;
   }
   console.log('back-end server connected to database');
+
   app.get('/reviews', (req, res) => {
     let product = req.query.product_id;
     let page = req.query.page || 1;
     let count = req.query.count || 5;
     let sort = req.query.sort;
-
     db.getReviews(product, page, count, sort, (err, dbResult) => {
       if (err) {
         res.status(500).send(err);
@@ -35,7 +35,6 @@ connection.connect((err) => {
 
   app.get('/reviews/meta', (req, res) => {
     let product = req.query.product_id;
-
     db.getReviewsMetadata(product, (err, dbResult) => {
       if (err) {
         res.status(500).send(err);
@@ -47,7 +46,6 @@ connection.connect((err) => {
 
   app.put('/reviews/:id/helpful', (req, res) => {
     let review_id = req.params.id;
-
     db.markReviewHelpful(review_id, (err, dbResult) => {
       if (err) {
         res.status(500).send(err);
@@ -59,7 +57,6 @@ connection.connect((err) => {
 
   app.put('/reviews/:id/report', (req, res) => {
     let review_id = req.params.id;
-
     db.reportReview(review_id, (err) => {
       if (err) {
         res.status(500).send(err);

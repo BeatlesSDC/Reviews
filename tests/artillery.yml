@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost:3001/reviews"
+  phases:
+    - duration: 10
+      arrivalRate: 100
+scenarios:
+  - name: "Getting all reviews for specific product"
+    weight: 20
+    flow:
+      - get:
+          url: "/?product_id={{ $randomNumber(1,1000010) }}"
+  - name: "Getting metadata for specific product"
+    weight: 20
+    flow:
+      - get:
+          url: "/meta/?product_id={{ $randomNumber(1,1000010) }}&count={{ $randomNumber(1,1000) }}&page={{ $randomNumber(1,5) }}"
+  - name: "Marking review as helpful"
+    weight: 5
+    flow:
+      - put:
+          url: "/{{ $randomNumber(1,1000010) }}/helpful"
+  - name: "Reporting review"
+    weight: 1
+    flow:
+      - put:
+          url: "/{{ $randomNumber(1,1000010) }}/report"
