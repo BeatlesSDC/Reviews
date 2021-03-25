@@ -2,25 +2,52 @@ config:
   target: "http://localhost:3001/reviews"
   phases:
     - duration: 10
-      arrivalRate: 100
+      arrivalRate: 1000
+  variables:
+    sort:
+      - ""
+      - "helpful"
+      - "newest"
+      - "relevant"
 scenarios:
   - name: "Getting all reviews for specific product"
     weight: 20
     flow:
       - get:
-          url: "/?product_id={{ $randomNumber(1,1000010) }}"
+          url: "/?product_id={{ $randomNumber(1,1000010) }}&count={{ $randomNumber(1,1000) }}&page={{ $randomNumber(1,5) }}&sort={{ sort }}"
   - name: "Getting metadata for specific product"
     weight: 20
     flow:
       - get:
-          url: "/meta/?product_id={{ $randomNumber(1,1000010) }}&count={{ $randomNumber(1,1000) }}&page={{ $randomNumber(1,5) }}"
+          url: "/meta/?product_id={{ $randomNumber(1,1000010) }}"
   - name: "Marking review as helpful"
     weight: 5
     flow:
       - put:
           url: "/{{ $randomNumber(1,1000010) }}/helpful"
   - name: "Reporting review"
-    weight: 1
+    weight: 3
     flow:
       - put:
           url: "/{{ $randomNumber(1,1000010) }}/report"
+  - name: "Posting review"
+    weight: 2
+    flow:
+      - post:
+          url: "/"
+          json:
+            product_id: "{{ $randomNumber(1,1000010) }}"
+            rating: "{{ $randomNumber(1,5) }}"
+            summary: "fake summary"
+            body: "testingtestingtestingtestingtestingtestingtesting!"
+            recommend: "{{ $randomNumber(0,1) }}"
+            name: "tester123"
+            email: "test@test.com"
+            photos: []
+            characteristics:
+              Width: "{{ $randomNumber(1,5) }}"
+              Size: "{{ $randomNumber(1,5) }}"
+              Comfort: "{{ $randomNumber(1,5) }}"
+              Quality: "{{ $randomNumber(1,5) }}"
+              Length: "{{ $randomNumber(1,5) }}"
+              Fit: "{{ $randomNumber(1,5) }}"

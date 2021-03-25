@@ -37,7 +37,10 @@ var reportReview = (reviewID, callback) => {
 }
 
 var addReview = (data, callback) => {
-  let { product_id, rating, summary, body, recommend, photos } = data;
+  let { summary, body, photos } = data;
+  let recommend = Number(data.recommend);
+  let product_id = Number(data.product_id);
+  let rating = Number(data.rating);
   let reviewer_email = data.email;
   let reviewer_name = data.name;
   let date = new Date().toISOString().split('T')[0];
@@ -53,9 +56,13 @@ var addReview = (data, callback) => {
         connection.getDb().collection('metadata').find({ _id: Number(product_id) }).forEach((doc) => {
           let { characteristicReviews, recommended, ratings } = doc;
           for (var characteristic in doc.characteristicReviews) {
-            characteristicReviews[characteristic].push(data.characteristics[characteristic]);
+            characteristicReviews[characteristic].push(Number(data.characteristics[characteristic]));
           }
-          recommended[recommend]++;
+          if (typeof recommend === 'string') {
+            recommended[recommend]++;
+          } else {
+            recommended[Boolean(recommend)]++;
+          }
           if (ratings[rating] === undefined) {
             ratings[rating] = 1;
           } else {
