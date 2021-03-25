@@ -14,6 +14,7 @@ var markReviewHelpful = (reviewID, callback) => {
 
 var reportReview = (reviewID, callback) => {
   connection.getDb().collection('reviews').find({ _id: Number(reviewID) }).forEach((doc) => {
+    doc.reported = 1;
     connection.getDb().collection('reported').insertOne(doc);
   })
   .then(() => {
@@ -27,12 +28,38 @@ var reportReview = (reviewID, callback) => {
   })
 }
 
-var addReview = (reviewID, callback) => {
-  connection.getDb().collection('reviews').find({ _id: Number(reviewID) }).forEach((doc) => {
-    connection.getDb().collection('reported').insertOne(doc);
-  })
+var addReview = (data, callback) => {
+  let { product_id, rating, summary, body, recommend, photos } = data;
+  let reviewer_email = data.email;
+  let reviewer_name = data.name;
+  let date = new Date().toISOString().split('T')[0];
+  var id;
+  connection.getDb().collection('counter').updateOne(
+    { _id: 'id' },
+    { $inc: { num: 1 }}
+  )
   .then(() => {
-    return connection.getDb().collection('reviews').deleteOne({ _id: Number(reviewID) });
+    connection.getDb().collection('counter').find().forEach((doc) => {
+      connection.getDb().collection('reviews').insertOne({ _id: doc.num, product_id, rating, summary, body, recommend, reviewer_name, reviewer_email, photos, date, helpfulness: 0, response: null, reported: 0 })
+      .then(() => {
+        connection.getDb().collection('metadata').find({ _id: Number(product_id) }).forEach((doc) => {
+          let { characteristicReviews, recommended, ratings } = doc;
+          for (var characteristic in doc.characteristicReviews) {
+            characteristicReviews[characteristic].push(data.characteristics[characteristic]);
+          }
+          recommended[recommend]++;
+          if (ratings[rating] === undefined) {
+            ratings[rating] = 1;
+          } else {
+            ratings[rating]++;
+          }
+          return connection.getDb().collection('metadata').updateOne(
+            { _id: Number(product_id) },
+            { $set: { characteristicReviews, recommended, ratings }}
+          );
+        })
+      })
+    })
   })
   .then(() => {
     callback(null);

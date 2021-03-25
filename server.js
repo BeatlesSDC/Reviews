@@ -22,7 +22,12 @@ connection.connect((err) => {
         res.status(500).send(err);
       } else {
         res.status(200).send({
-          product, page, count, results: dbResult
+          product, page, count, results: dbResult.map(result => {
+            if (result.response === 'null') {
+              result.response = null;
+            }
+            return result;
+          })
         });
       }
     });
@@ -65,25 +70,13 @@ connection.connect((err) => {
   })
 
   app.post('/reviews', (req, res) => {
-    console.log(req.body);
-    res.sendStatus(200);
-    // let product = req.query.product_id;
-    // let rating = req.query.rating;
-    // let summary = req.query.summary;
-    // let body = req.query.body;
-    // let recommend = req.query.recommend;
-    // let name = req.query.name;
-    // let email = req.query.email;
-    // let photos = req.query.photos;
-    // let characteristics = req.query.characteristics;
-
-    // db.addReview(product, rating, summary, body, recommend, name, email, photos, characteristics, (err) => {
-    //   if (err) {
-    //     res.status(500).send(err);
-    //   } else {
-    //     res.sendStatus(201);
-    //   }
-    // });
+    db.addReview(req.body, (err) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.sendStatus(201);
+      }
+    });
   })
 
   app.listen(3001, () => {

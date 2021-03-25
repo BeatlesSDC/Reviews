@@ -10,7 +10,6 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (e
   }
   var db = client.db('SDC');
 
-  // run this command in mongo terminal to create metaData documents with correct characteristics
   db.collection('RAWDATA_availableCharacteristics').aggregate([
     { $group : { _id: '$product_id', characteristics: { $push: '$name' }, ids: { $push: '$id' }}},
     { $out: 'metaDataMerged' }
